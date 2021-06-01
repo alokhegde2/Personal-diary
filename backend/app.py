@@ -67,8 +67,6 @@ def getUserDetails(id):
         fields=unpack(buf)
         if id == fields[0]:
           print("record found\n")
-          print("record details are\n usn:"+fields[0]+ "\n name:"+fields[1]+"\nbranch:"+fields[2]+"\n sem:"+fields[3])
-
           flag=1
           return jsonify(
             id = fields[0],
@@ -83,7 +81,7 @@ def getUserDetails(id):
       return  jsonify(
         category="error",
         status=404
-      )
+      ),404
 
 
 
