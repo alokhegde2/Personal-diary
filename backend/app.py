@@ -1,6 +1,7 @@
 #This is the main file please write all your codes here by cloning this repo
 from flask import Flask, request, jsonify
 import os
+import uuid
 
 
 # Init app
@@ -46,7 +47,7 @@ def register_user():
   email = request.json['email']
   name = request.json['name']
   password = request.json['password']
-  user_id = "20"
+  user_id = uuid.uuid1()
   buf=''
   flag=0
   with open(basedir+'/test.txt',"r") as file:
