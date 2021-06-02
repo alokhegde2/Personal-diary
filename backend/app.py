@@ -14,8 +14,8 @@ global buf
 
 #pack()
 
-def pack(usn,name,branch,sem):
-  buf=usn+'|'+name+'|'+branch+'|'+sem+'#'
+def pack(user_id,name,password,email):
+  buf=user_id+'|'+name+'|'+password+'|'+email+'#'
   return buf
 
 #unpack()  
@@ -27,35 +27,62 @@ def unpack(s):
 #file_write()
 
 def file_write(buf):
-  with open("var.txt","a") as file:
+  with open(basedir+"/test.txt","a") as file:
     file.write(buf)
   file.close()
 
 #insert()
 
-def insert():
-  usn = input("enter usn\t")
-  name = input("enter name\t")
-  branch= input("enter branch\t")
-  sem = input("enter semester\t")
-  buf=pack(usn,name,branch,sem)
+def insert(user_id,name,password,email):
+  buf=pack(user_id,name,password,email)
   file_write(buf)
+
 
 # Create the routes here
 
 #register a user route
-@app.route('/user/register',methods= ["GET"])
+@app.route('/user/register',methods= ["POST"])
 def register_user():
-  file = open(basedir+'/test.txt','r')
-  return file.read()
-  
-@app.route('/user/<id>',methods = ["GET"])
-def getUserDetails(id):
-  # file = open(basedir+'/test.txt','r')
-  # return file.read()
+  email = request.json['email']
+  name = request.json['name']
+  password = request.json['password']
+  user_id = "20"
   buf=''
   flag=0
-  # key=id
+  with open(basedir+'/test.txt',"r") as file:
+    while True:
+      ch=file.read(1)
+      if not ch:
+        break
+      if ch!='#':
+        buf=buf+ch
+      else:
+        fields=unpack(buf)
+        if email == fields[3]:
+          print("record found\n")
+          flag=1
+          return jsonify(
+            email = email,
+            error ="Email already exists"
+          ),409
+        buf=''
+    if flag==0:
+      print("\n\n\nrecord doesnt exist")
+      buf=pack(user_id,name,password,email)
+      file_write(buf)
+      return jsonify(
+        status = "Successs",
+        message = "New user created"
+      )
+
+
+
+#to get the single user details
+
+@app.route('/user/<id>',methods = ["GET"])
+def getUserDetails(id):
+  buf=''
+  flag=0
   with open(basedir+'/test.txt',"r") as file:
     while True:
       ch=file.read(1)
