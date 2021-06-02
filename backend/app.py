@@ -76,6 +76,40 @@ def register_user():
         message = "New user created"
       )
 
+# to login the user
+
+@app.route('/user/login',methods = ["POST"])
+def login_user():
+  email = request.json["email"]
+  password = request.json["password"]
+  buf=''
+  flag=0
+  with open(basedir+'/test.txt',"r") as file:
+    while True:
+      ch=file.read(1)
+      if not ch:
+        break
+      if ch!='#':
+        buf=buf+ch
+      else:
+        fields=unpack(buf)
+        if email == fields[3]:
+          print("record found\n")
+          if password == fields[2]:
+            return jsonify(
+              message = "Login success"
+            ),200
+          return jsonify(
+            message = "Password is not matching"
+          ),403
+        buf=''
+    if flag==0:
+      print("\n\n\nrecord doesnt exist")
+      file.close()
+      return  jsonify(
+        status="Email not found",
+      ),404
+
 
 
 #to get the single user details
