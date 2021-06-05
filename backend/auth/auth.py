@@ -55,17 +55,17 @@ def login_user():
         if email == fields[3]:
           if password == fields[2]:
             return jsonify(
+              user_id = fields[0],
               message = "Login success"
             ),200
           return jsonify(
-            message = "Password is not matching"
+            message = "Incorrect Password"
           ),403
         buf=''
     if flag==0:
-      print("\n\n\nrecord doesnt exist")
       file.close()
       return  jsonify(
-        status="Email not found",
+        message="Email not found",
       ),404
 
 
