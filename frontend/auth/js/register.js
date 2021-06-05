@@ -3,6 +3,9 @@ const username = document.getElementById('username');
 const email = document.getElementById('email');
 const password = document.getElementById('password');
 const password2 = document.getElementById('password2');
+const login = document.getElementById('login')
+
+const isError = false;
 
 
 //Show input error message
@@ -62,3 +65,10 @@ form.addEventListener('submit',function(e) {
     checkLength(username,3,15);
     checkLength(password,6,15);
 });
+
+
+//on click on login 
+login.addEventListener('click',function(e) {
+    e.preventDefault();
+    window.location.assign("../html/login.html")
+})
