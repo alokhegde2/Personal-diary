@@ -4,7 +4,7 @@ const email = document.getElementById("email");
 const password = document.getElementById("password");
 const password2 = document.getElementById("password2");
 const login = document.getElementById("login");
-const error = document.getElementById("error")
+const error = document.getElementById("error");
 
 let isError = false;
 
@@ -27,10 +27,10 @@ function checkRequired(inputArr) {
   inputArr.forEach((input) => {
     if (input.value.trim() === "") {
       showError(input, `${getFieldName(input)} is required`);
-      isError=true
+      isError = true;
     } else {
       showSuccess(input);
-      isError=false
+      isError = false;
     }
   });
 }
@@ -42,16 +42,16 @@ function checkLength(input, min, max) {
       input,
       `${getFieldName(input)} must be atleast ${min} characters`
     );
-    isError=true;
+    isError = true;
   } else if (input.value.length > max) {
     showError(
       input,
       `${getFieldName(input)} must be less than ${max} characters`
     );
-    isError=true;
+    isError = true;
   } else {
     showSuccess(input);
-    isError=false;
+    isError = false;
   }
 }
 
@@ -59,22 +59,22 @@ function checkLength(input, min, max) {
 function checkPasswordsMatch(input1, input2) {
   if (input1.value !== input2.value) {
     showError(input2, "Passwords do not match");
-    isError=true
+    isError = true;
   } else {
     showSuccess(input1);
-    isError=false
+    isError = false;
   }
 }
 
+
 //POST request
-function doRequest(username,mail,pass) {
-    console.log(mail.value)
+function doRequest(username, mail, pass) {
   fetch("http://127.0.0.1:5000/user/register", {
     method: "POST",
     body: JSON.stringify({
-        email:mail.value,
-        name:username.value,
-        password:pass.value
+      email: mail.value,
+      name: username.value,
+      password: pass.value,
     }),
     headers: {
       "Content-type": "application/json",
@@ -83,12 +83,12 @@ function doRequest(username,mail,pass) {
     .then(function (response) {
       if (response.ok) {
         error.innerText = "";
-        window.location.assign("../html/login.html");
+        window.location.assign("../html/login.html");  
         return response.json();
       }
-      if(response.status == 409){
-          console.log("Email is already registered")
-          error.innerText = "Email is already registered";
+      if (response.status == 409) {
+        console.log("Email is already registered");
+        error.innerText = "Email is already registered";
       }
       return Promise.reject(response);
     })
@@ -108,9 +108,9 @@ form.addEventListener("submit", function (e) {
   checkRequired([username, email, password, password2]);
   checkLength(username, 3, 15);
   checkLength(password, 6, 15);
-  checkPasswordsMatch(password,password2)
-  if(!isError){
-  doRequest(username, email, password);
+  checkPasswordsMatch(password, password2);
+  if (!isError) {
+    doRequest(username, email, password);
   }
 });
 
