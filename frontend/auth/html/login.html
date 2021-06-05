@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../../assets/images/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/login.css">
+    <script>
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
     <title>Personal Diary-Login</title>
 </head>
 <body>
@@ -21,6 +26,9 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" placeholder="Enter password">
                 <small>Error Message</small>
+            </div>
+            <div class="error">
+                <small id="error"></small>
             </div>
             <button>Submit</button>
             <p>Don't have an account ? <span id="register"> Register</span></p>
