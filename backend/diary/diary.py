@@ -23,6 +23,8 @@ def insert(note_id,name,date,description):
 	buf=pack(note_id,name,date,description)
 	file_write(buf)
 
+#creating new diary
+
 @diary.route('/new',methods=["POST"])
 def create():
 	note_id=str(uuid.uuid1())
@@ -44,4 +46,4 @@ def create():
 			if flag==0:
 				buf=pack(note_id,name,date,description)
 				file_write(buf)
-				return jsonify({"message": "success"}),400
+				return jsonify({"message": "success"}),200
