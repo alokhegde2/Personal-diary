@@ -139,53 +139,7 @@ def getUserDetails(id):
         status=404
       ),404
 
-# @auth.route('/changepass',methods=["POST"])
-# def changePassword():
-#   old_password = request.json['old_password']
-#   new_password = request.json['new_password']
-#   user_id = request.json['user_id']
-#   buf=''
-#   flag=0
-#   key=user_id
-#   with open(basedir+'/user.txt',"r+") as file:
-#     while True:
-#       ch=file.read(1)
-#       if not ch:
-#           break
-#       if ch!='#':
-#           buf=buf+ch
-#       else:
-#           fields=unpack(buf)
-#           if key== fields[0]:
-#             if old_password != fields[2]:
-#               return jsonify(
-#                 status="error",
-#                 message="Password not matching"
-#                 ),400
-
-                
-#             flag=1
-#             prev=file.tell()
-#             lenbuf=len(buf)
-#             file.seek(prev-lenbuf-1,0)
-#             c='*'
-#             file.write(c)
-#             file.close()
-#             insert(user_id,fields[1],new_password,fields[3])
-#             return jsonify(
-#               status = "Successs",
-#               message = "User updated"
-#                )
-#           buf=''
-#   if flag==0:
-#     return jsonify(
-#       status = "error",
-#       message = "User not updated"
-#       )
-#   file.close()
-
-
-@auth.route('/changepass',methods=["POST"])
+@auth.route('/changepass',methods=["PUT"])
 def changePassword():
   old_password = request.json['old_password']
   new_password = request.json['new_password']
@@ -198,22 +152,26 @@ def changePassword():
       ch=file.read(1)
       if not ch:
           break
-      # elif ch.strip("#") != old_password:
-      #   file.write(ch)
       if ch!='#':
           buf=buf+ch
       else:
           fields=unpack(buf)
           if key== fields[0]:
-            if old_password != fields[2]:
+            if not check_password_hash(bytes(fields[2],"utf-8"),old_password):
               return jsonify(
                 status="error",
                 message="Password not matching"
                 ),400
 
-            if ch.strip("#") != old_password:
-              file.write(ch)   
+                
             flag=1
+            prev=file.tell()
+            lenbuf=len(buf)
+            file.seek(prev-lenbuf-1,0)
+            c='*'
+            file.write(c)
+            file.close()
+            new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
             insert(user_id,fields[1],new_password,fields[3])
             return jsonify(
               status = "Successs",
@@ -226,3 +184,48 @@ def changePassword():
       message = "User not updated"
       )
   file.close()
+
+
+# @auth.route('/changepass',methods=["PUT"])
+# def changePassword():
+#   old_password = request.json['old_password']
+#   new_password = request.json['new_password']
+#   user_id = request.json['user_id']
+#   buf=''
+#   flag=0
+#   key=user_id
+#   with open(basedir+'/user.txt',"r+") as file:
+#     while True:
+#       ch=file.read(1)
+#       if not ch:
+#           break
+#       # elif ch.strip("#") != old_password:
+#       #   file.write(ch)
+#       if ch!='#':
+#           buf=buf+ch
+#       else:
+#           fields=unpack(buf)
+#           if key== fields[0]:
+#             pass_match = check_password_hash(bytes(fields[2],"utf-8"),old_password)
+#             if not pass_match:
+#               return jsonify(
+#                 status="error",
+#                 message="Password not matching"
+#                 ),400
+
+#             if ch.strip("#") != old_password:
+#               file.write(ch)   
+#             flag=1
+#             new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
+#             insert(user_id,fields[1],new_password,fields[3])
+#             return jsonify(
+#               status = "Successs",
+#               message = "User updated"
+#                )
+#           buf=''
+#   if flag==0:
+#     return jsonify(
+#       status = "error",
+#       message = "User not updated"
+#       )
+#   file.close()
