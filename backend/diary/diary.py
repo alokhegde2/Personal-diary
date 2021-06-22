@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify,Blueprint
+from datetime import date
 import os
 import uuid
 
@@ -6,8 +7,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 diary = Blueprint('diary', __name__)
 
-def pack(note_id,name,date,description):
-	buf=str(note_id+'|'+name+'|'+date+'|'+description+'#')
+def pack(note_id,user_id,name,date,description):
+	buf=str(note_id+'|'+user_id+'|'+name+'|'+date+'|'+description+'#')
 	return buf
 
 def unpack(s):
@@ -19,15 +20,14 @@ def file_write(buf):
 		file.write(buf)
 	file.close()
 
-def insert(note_id,name,date,description):
-	buf=pack(note_id,name,date,description)
+def insert(note_id,user_id,name,date,description):
+	buf=pack(note_id,user_id,name,date,description)
 	file_write(buf)
-
 @diary.route('/new',methods=["POST"])
 def create():
+	create_date=date.today()
 	note_id=str(uuid.uuid1())
 	name=request.json["name"]
-	date=request.json["date"]
 	description=request.json["description"]
 	buf=''
 	flag=0
@@ -42,6 +42,6 @@ def create():
 				else:
 					fields=unpack(buf)
 			if flag==0:
-				buf=pack(note_id,name,date,description)
+				buf=pack(note_id,user_id,name,date,description)
 				file_write(buf)
 				return jsonify({"message": "success"}),400
