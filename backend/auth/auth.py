@@ -32,6 +32,7 @@ def file_write(buf):
     file.write(buf)
   file.close()
 
+
 #insert()
 
 def insert(user_id,name,password,email):
@@ -139,6 +140,8 @@ def getUserDetails(id):
         status=404
       ),404
 
+# Changing password
+
 @auth.route('/changepass',methods=["PUT"])
 def changePassword():
   old_password = request.json['old_password']
@@ -186,46 +189,38 @@ def changePassword():
   file.close()
 
 
-# @auth.route('/changepass',methods=["PUT"])
-# def changePassword():
-#   old_password = request.json['old_password']
-#   new_password = request.json['new_password']
-#   user_id = request.json['user_id']
-#   buf=''
-#   flag=0
-#   key=user_id
-#   with open(basedir+'/user.txt',"r+") as file:
-#     while True:
-#       ch=file.read(1)
-#       if not ch:
-#           break
-#       # elif ch.strip("#") != old_password:
-#       #   file.write(ch)
-#       if ch!='#':
-#           buf=buf+ch
-#       else:
-#           fields=unpack(buf)
-#           if key== fields[0]:
-#             pass_match = check_password_hash(bytes(fields[2],"utf-8"),old_password)
-#             if not pass_match:
-#               return jsonify(
-#                 status="error",
-#                 message="Password not matching"
-#                 ),400
+#Deleting user
 
-#             if ch.strip("#") != old_password:
-#               file.write(ch)   
-#             flag=1
-#             new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
-#             insert(user_id,fields[1],new_password,fields[3])
-#             return jsonify(
-#               status = "Successs",
-#               message = "User updated"
-#                )
-#           buf=''
-#   if flag==0:
-#     return jsonify(
-#       status = "error",
-#       message = "User not updated"
-#       )
-#   file.close()
+@auth.route('/delete-user',methods=["POST"])
+def delete():
+  test = []
+  buf=''
+  flag=0
+  with open(basedir+'/user.txt',"r+") as file:
+    while True:
+      ch=file.read(1)
+      if not ch:
+        break
+      if ch!='#':
+        buf=buf+ch
+      else:
+        fields=unpack(buf)
+        test.append(fields)
+        buf=''
+    for i in test:
+      print(i[0])
+      if(i[0] == request.json["user_id"]):
+        index = test.index(i)
+        test.pop(index)
+        file.truncate(0)
+        for lines in test:
+          insert(lines[0],lines[1],lines[2],lines[3])
+    return jsonify(
+      message="User Deleted"
+      ),200
+    if flag==0:
+      file.close()
+      return  jsonify(
+        message="Record doesnt exist",
+        status=404
+      ),404
