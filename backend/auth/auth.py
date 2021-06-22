@@ -2,9 +2,11 @@
 from flask import Flask, request, jsonify,Blueprint
 import os
 import uuid
+from flask_bcrypt import generate_password_hash,check_password_hash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 auth = Blueprint('auth', __name__)
+# bcrypt = Bcrypt(app)
 
 #pack(),unpack(),search() functions
 
@@ -53,7 +55,7 @@ def login_user():
       else:
         fields=unpack(buf)
         if email == fields[3]:
-          if password == fields[2]:
+          if check_password_hash(bytes(fields[2],"utf-8"),password):
             return jsonify(
               user_id = fields[0],
               message = "Login success"
@@ -74,7 +76,7 @@ def login_user():
 def register_user():
   email = request.json['email']
   name = request.json['name']
-  password = request.json['password']
+  password = generate_password_hash(request.json['password']).decode('utf-8')
   user_id = str(uuid.uuid1())
   buf=''
   flag=0
