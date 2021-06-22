@@ -129,7 +129,6 @@ def getUserDetails(id):
           return jsonify(
             id = fields[0],
             name = fields[1],
-            password = fields[2],
             mail = fields[3],
           ),200
         buf=''
