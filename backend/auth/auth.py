@@ -2,9 +2,11 @@
 from flask import Flask, request, jsonify,Blueprint
 import os
 import uuid
+from flask_bcrypt import generate_password_hash,check_password_hash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 auth = Blueprint('auth', __name__)
+# bcrypt = Bcrypt(app)
 
 #pack(),unpack(),search() functions
 
@@ -53,7 +55,7 @@ def login_user():
       else:
         fields=unpack(buf)
         if email == fields[3]:
-          if password == fields[2]:
+          if check_password_hash(bytes(fields[2],"utf-8"),password):
             return jsonify(
               user_id = fields[0],
               message = "Login success"
@@ -74,7 +76,7 @@ def login_user():
 def register_user():
   email = request.json['email']
   name = request.json['name']
-  password = request.json['password']
+  password = generate_password_hash(request.json['password']).decode('utf-8')
   user_id = str(uuid.uuid1())
   buf=''
   flag=0
@@ -127,7 +129,6 @@ def getUserDetails(id):
           return jsonify(
             id = fields[0],
             name = fields[1],
-            password = fields[2],
             mail = fields[3],
           ),200
         buf=''
@@ -138,53 +139,7 @@ def getUserDetails(id):
         status=404
       ),404
 
-# @auth.route('/changepass',methods=["POST"])
-# def changePassword():
-#   old_password = request.json['old_password']
-#   new_password = request.json['new_password']
-#   user_id = request.json['user_id']
-#   buf=''
-#   flag=0
-#   key=user_id
-#   with open(basedir+'/user.txt',"r+") as file:
-#     while True:
-#       ch=file.read(1)
-#       if not ch:
-#           break
-#       if ch!='#':
-#           buf=buf+ch
-#       else:
-#           fields=unpack(buf)
-#           if key== fields[0]:
-#             if old_password != fields[2]:
-#               return jsonify(
-#                 status="error",
-#                 message="Password not matching"
-#                 ),400
-
-                
-#             flag=1
-#             prev=file.tell()
-#             lenbuf=len(buf)
-#             file.seek(prev-lenbuf-1,0)
-#             c='*'
-#             file.write(c)
-#             file.close()
-#             insert(user_id,fields[1],new_password,fields[3])
-#             return jsonify(
-#               status = "Successs",
-#               message = "User updated"
-#                )
-#           buf=''
-#   if flag==0:
-#     return jsonify(
-#       status = "error",
-#       message = "User not updated"
-#       )
-#   file.close()
-
-
-@auth.route('/changepass',methods=["POST"])
+@auth.route('/changepass',methods=["PUT"])
 def changePassword():
   old_password = request.json['old_password']
   new_password = request.json['new_password']
@@ -197,22 +152,26 @@ def changePassword():
       ch=file.read(1)
       if not ch:
           break
-      # elif ch.strip("#") != old_password:
-      #   file.write(ch)
       if ch!='#':
           buf=buf+ch
       else:
           fields=unpack(buf)
           if key== fields[0]:
-            if old_password != fields[2]:
+            if not check_password_hash(bytes(fields[2],"utf-8"),old_password):
               return jsonify(
                 status="error",
                 message="Password not matching"
                 ),400
 
-            if ch.strip("#") != old_password:
-              file.write(ch)   
+                
             flag=1
+            prev=file.tell()
+            lenbuf=len(buf)
+            file.seek(prev-lenbuf-1,0)
+            c='*'
+            file.write(c)
+            file.close()
+            new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
             insert(user_id,fields[1],new_password,fields[3])
             return jsonify(
               status = "Successs",
@@ -225,3 +184,48 @@ def changePassword():
       message = "User not updated"
       )
   file.close()
+
+
+# @auth.route('/changepass',methods=["PUT"])
+# def changePassword():
+#   old_password = request.json['old_password']
+#   new_password = request.json['new_password']
+#   user_id = request.json['user_id']
+#   buf=''
+#   flag=0
+#   key=user_id
+#   with open(basedir+'/user.txt',"r+") as file:
+#     while True:
+#       ch=file.read(1)
+#       if not ch:
+#           break
+#       # elif ch.strip("#") != old_password:
+#       #   file.write(ch)
+#       if ch!='#':
+#           buf=buf+ch
+#       else:
+#           fields=unpack(buf)
+#           if key== fields[0]:
+#             pass_match = check_password_hash(bytes(fields[2],"utf-8"),old_password)
+#             if not pass_match:
+#               return jsonify(
+#                 status="error",
+#                 message="Password not matching"
+#                 ),400
+
+#             if ch.strip("#") != old_password:
+#               file.write(ch)   
+#             flag=1
+#             new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
+#             insert(user_id,fields[1],new_password,fields[3])
+#             return jsonify(
+#               status = "Successs",
+#               message = "User updated"
+#                )
+#           buf=''
+#   if flag==0:
+#     return jsonify(
+#       status = "error",
+#       message = "User not updated"
+#       )
+#   file.close()
