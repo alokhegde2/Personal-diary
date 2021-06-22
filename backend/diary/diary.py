@@ -25,7 +25,7 @@ def insert(note_id,user_id,name,date,description):
 	file_write(buf)
 @diary.route('/new',methods=["POST"])
 def create():
-	create_date=date.today()
+	create_date=str(date.today())
 	note_id=str(uuid.uuid1())
 	name=request.json["name"]
 	description=request.json["description"]
