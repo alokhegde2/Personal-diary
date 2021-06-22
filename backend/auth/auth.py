@@ -40,6 +40,41 @@ def insert(user_id,name,password,email):
   file_write(buf)
 
 
+#delete
+def delete_user(user_id):
+  test = []
+  buf=''
+  flag=0
+  with open(basedir+'/user.txt',"r+") as file:
+    while True:
+      ch=file.read(1)
+      if not ch:
+        break
+      if ch!='#':
+        buf=buf+ch
+      else:
+        fields=unpack(buf)
+        test.append(fields)
+        buf=''
+    for i in test:
+      if(i[0] == user_id):
+        index = test.index(i)
+        test.pop(index)
+        file.truncate(0)
+        for lines in test:
+          insert(lines[0],lines[1],lines[2],lines[3])
+        break
+    return jsonify(
+      message="User Deleted"
+      ),200
+    if flag==0:
+      file.close()
+      return  jsonify(
+        message="Record doesnt exist",
+        status=404
+      ),404
+
+
 @auth.route('/login',methods = ["POST"])
 def login_user():
   email = request.json["email"]
@@ -165,17 +200,10 @@ def changePassword():
                 status="error",
                 message="Password not matching"
                 ),400
-
-                
             flag=1
-            prev=file.tell()
-            lenbuf=len(buf)
-            file.seek(prev-lenbuf-1,0)
-            c='*'
-            file.write(c)
-            file.close()
             new_password = generate_password_hash(request.json['new_password']).decode('utf-8')
             insert(user_id,fields[1],new_password,fields[3])
+            delete_user(request.json['user_id'])
             return jsonify(
               status = "Successs",
               message = "User updated"
@@ -208,7 +236,6 @@ def delete():
         test.append(fields)
         buf=''
     for i in test:
-      print(i[0])
       if(i[0] == request.json["user_id"]):
         index = test.index(i)
         test.pop(index)
