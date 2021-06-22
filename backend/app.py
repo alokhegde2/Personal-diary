@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 
 import flask
 from auth.auth import auth
+from diary.diary import diary
 
 
 
@@ -14,6 +15,8 @@ app = Flask(__name__)
 #register all your routes here
 
 app.register_blueprint(auth,url_prefix="/user")
+#http://localhost:3000/diary/
+app.register_blueprint(diary,url_prefix="/diary")
 
 
 
