@@ -36,6 +36,41 @@ def insert(note_id, user_id, name, date, description):
     buf = pack(note_id, user_id, name, date, description)
     file_write(buf)
 
+#Delete diary
+
+def delete_diary(note_id):
+    data = []
+    buf = ''
+    flag = 0
+    with open(basedir+'/diary.txt', "r+") as file:
+        while True:
+            ch = file.read(1)
+            if not ch:
+                break
+            if ch != '#':
+                buf = buf+ch
+            else:
+                fields = unpack(buf)
+                data.append(fields)
+                buf = ''
+        for i in data:
+            if(i[0] == note_id):
+                index = data.index(i)
+                data.pop(index)
+                file.truncate(0)
+                for lines in data:
+                    insert(lines[0], lines[1], lines[2], lines[3],lines[4])
+                break
+        return jsonify(
+            message="Diary Deleted"
+        ), 200
+        if flag == 0:
+            file.close()
+            return jsonify(
+                message="Record doesnt exist",
+                status=404
+            ), 404
+
 # Verify user id
 
 
@@ -70,7 +105,7 @@ def verify_user(id):
 
 @diary.route('/new', methods=["POST"])
 def create():
-    create_date = str(date.today())
+    created_date = str(date.today())
     note_id = str(uuid.uuid1())
     name = request.json["name"]
     description = request.json["description"]
@@ -88,7 +123,7 @@ def create():
                 else:
                     fields = unpack(buf)
             if flag == 0:
-                buf = pack(note_id, user_id, name, create_date, description)
+                buf = pack(note_id, user_id, name, created_date, description)
                 file_write(buf)
                 return jsonify({"message": "success"}), 200
 
@@ -134,3 +169,45 @@ def getAllDiary(user_id):
                 message="Record not found",
                 status=404
             ), 404
+
+
+#Update the single diary
+
+@diary.route("/update-diary/<noteId>/<userId>", methods=["PUT"])
+def updateDiary(noteId,userId):
+    note_id = noteId
+    user_id = userId
+    name = request.json["name"]
+    created_date = str(date.today())
+    description = request.json["description"]
+    buf = ''
+    flag = 0
+    key = noteId
+    with open(basedir+'/diary.txt', "r+") as file:
+        while True:
+            ch = file.read(1)
+            if not ch:
+                break
+            if ch != '#':
+                buf = buf+ch
+            else:
+                fields = unpack(buf)
+                if not verify_user(userId):
+                    return jsonify(
+                        message="User not found"
+                    ), 400
+                if key == fields[0]:
+                    flag = 1
+                    insert(note_id, user_id, name, created_date,description)
+                    delete_diary(noteId)
+                    return jsonify(
+                        status="Successs",
+                        message="Diary updated"
+                    ),200
+                buf = ''
+    if flag == 0:
+        return jsonify(
+            status="Error",
+            message="Diary not found"
+        ),400
+    file.close()
