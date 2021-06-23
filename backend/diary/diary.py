@@ -36,7 +36,8 @@ def insert(note_id, user_id, name, date, description):
     buf = pack(note_id, user_id, name, date, description)
     file_write(buf)
 
-#Delete diary
+# Delete diary
+
 
 def delete_diary(note_id):
     data = []
@@ -59,17 +60,12 @@ def delete_diary(note_id):
                 data.pop(index)
                 file.truncate(0)
                 for lines in data:
-                    insert(lines[0], lines[1], lines[2], lines[3],lines[4])
+                    insert(lines[0], lines[1], lines[2], lines[3], lines[4])
                 break
-        return jsonify(
-            message="Diary Deleted"
-        ), 200
+        return "success"
         if flag == 0:
             file.close()
-            return jsonify(
-                message="Record doesnt exist",
-                status=404
-            ), 404
+            return "error"
 
 # Verify user id
 
@@ -125,7 +121,12 @@ def create():
             if flag == 0:
                 buf = pack(note_id, user_id, name, created_date, description)
                 file_write(buf)
-                return jsonify({"message": "success"}), 200
+                return jsonify(message="Diary Created"), 200
+        if flag == 0:
+            file.close()
+            return jsonify(
+                message="Diary not created",
+            ), 400
 
 
 # to get all diary using user_id
@@ -167,14 +168,13 @@ def getAllDiary(user_id):
             file.close()
             return jsonify(
                 message="Record not found",
-                status=404
-            ), 404
+            ), 400
 
 
-#Update the single diary
+# Update the single diary
 
 @diary.route("/update-diary/<noteId>/<userId>", methods=["PUT"])
-def updateDiary(noteId,userId):
+def updateDiary(noteId, userId):
     note_id = noteId
     user_id = userId
     name = request.json["name"]
@@ -198,16 +198,33 @@ def updateDiary(noteId,userId):
                     ), 400
                 if key == fields[0]:
                     flag = 1
-                    insert(note_id, user_id, name, created_date,description)
+                    insert(note_id, user_id, name, created_date, description)
                     delete_diary(noteId)
                     return jsonify(
-                        status="Successs",
                         message="Diary updated"
-                    ),200
+                    ), 200
                 buf = ''
     if flag == 0:
         return jsonify(
-            status="Error",
             message="Diary not found"
-        ),400
+        ), 400
     file.close()
+
+
+# To Delete single diary
+
+@diary.route("/delete-diary/<noteId>/<userId>", methods=["DELETE"])
+def deleteDiary(noteId, userId):
+    if not verify_user(userId):
+        return jsonify(
+            message="User not found"
+        ), 400
+    response = delete_diary(noteId)
+    if response == "success":
+        return jsonify(
+            message="Diary deleted"
+        ), 200
+    if response == "error":
+        return jsonify(
+            message="Diary not deleted"
+        ), 400
