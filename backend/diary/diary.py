@@ -128,6 +128,39 @@ def create():
                 message="Diary not created",
             ), 400
 
+# to get single diary using note_id
+
+@diary.route('/search/<note_id>/<user_id>',methods=["POST"])
+def search(note_id,user_id):
+    buf=''
+    flag=0
+    with open(basedir+'/diary.txt',"r") as file:
+        while True:
+            ch=file.read(1)
+            if not ch:
+                break
+            if ch!='#':
+                buf=buf+ch
+            else:
+                fields=unpack(buf)
+                if not verify_user(user_id):
+                    return jsonify(
+                        message="User not found"
+                    ), 400
+                if note_id== fields[0]:
+                    print("details found\n")
+                    flag=1
+                    return jsonify(
+                        user_id=fields[1],
+                        note_id=fields[0],
+                        name=fields[2],
+                        today=fields[3],
+                        description=fields[4]
+                        ),200
+                buf=''
+        if flag==0:
+            file.close()
+            return jsonify(message="user_id not found"),404
 
 # to get all diary using user_id
 
