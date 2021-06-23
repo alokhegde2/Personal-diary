@@ -84,18 +84,15 @@ def getAllDiary(user_id):
                         "description":fields[4]
                         }
                     diary.append(data)
-                    # return jsonify(
-                    #     id=fields[0],
-                    #     name=fields[1],
-                    #     mail=fields[3],
-                    # ), 200
                 buf = ''
         if flag == 1:  
             print(diary)
-            return "Hello"
+            return jsonify(
+                       diary=diary
+                    ), 200
         if flag == 0:
             file.close()
             return jsonify(
-                message="Record doesnt exist",
+                message="Record not found",
                 status=404
             ), 404 
