@@ -113,7 +113,7 @@ def delete_user(user_id):
 
 def delete_diary(id):
     new_path = os.path.join(basedir, '..\\diary\\diary.txt')
-    print(new_path)
+
     diary = []
     buf = ''
     flag = 0
@@ -209,7 +209,7 @@ def register_user():
                     ), 409
                 buf = ''
         if flag == 0:
-            print("\n\n\nrecord doesnt exist")
+
             buf = pack(user_id, name, password, email)
             file_write(buf)
             return jsonify(
@@ -234,7 +234,7 @@ def getUserDetails(id):
             else:
                 fields = unpack(buf)
                 if id == fields[0]:
-                    print("record found\n")
+
                     flag = 1
                     return jsonify(
                         id=fields[0],
