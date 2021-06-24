@@ -94,6 +94,14 @@ def verify_user(id):
             file.close()
             return False
 
+#to check diary name already in list
+
+def check_list(note_id,diary):
+    for i in range(0,len(diary)):
+        if diary[i]["note_id"] == note_id:
+            return False
+    return True
+
 # All routes goes here
 
 # to create new diary
@@ -288,16 +296,74 @@ def searchDiaryByDate(userId):
                     ), 400
                 if userId == fields[1]:
                     if created_date == fields[3]:
-                        flag = 1
-                        data = {
+                        if check_list(fields[0],diary):
+                            flag = 1
+                            data = {
                             "note_id": fields[0],
                             "user_id": fields[1],
                             "name": fields[2],
                             "date": fields[3],
                             "description": fields[4]
-                        }
-                    diary.append(data)
+                            }
+                            diary.append(data)
+                        else:
+                            continue
                 buf = ''
+        if len(diary) == 0:
+            return jsonify(
+                message="No results found"
+                ),400
+        if flag == 1:
+            return jsonify(
+                diary=diary
+            ), 200
+        if flag == 0:
+            file.close()
+            return jsonify(
+                message="Record not found",
+            ), 400
+
+
+# To search diary using diary name
+
+@diary.route("/search-by/name/<userId>", methods=["POST"])
+def searchDiaryByName(userId):
+    diary = []
+    name = str(request.json["name"])
+    buf = ''
+    flag = 0
+    with open(basedir+'/diary.txt', "r") as file:
+        while True:
+            ch = file.read(1)
+            if not ch:
+                break
+            if ch != '#':
+                buf = buf+ch
+            else:
+                fields = unpack(buf)
+                if not verify_user(userId):
+                    return jsonify(
+                        message="User not found"
+                    ), 400
+                if userId == fields[1]:
+                    if name in fields[2]:
+                        if check_list(fields[0],diary):
+                            flag = 1
+                            data = {
+                            "note_id": fields[0],
+                            "user_id": fields[1],
+                            "name": fields[2],
+                            "date": fields[3],
+                            "description": fields[4]
+                            }
+                            diary.append(data)
+                        else:
+                            continue
+                buf = ''
+        if len(diary) == 0:
+            return jsonify(
+                message="No results found"
+                ),400
         if flag == 1:
             return jsonify(
                 diary=diary
