@@ -130,39 +130,41 @@ def create():
 
 # to get single diary using note_id
 
-@diary.route('/search/<note_id>/<user_id>',methods=["POST"])
-def search(note_id,user_id):
-    buf=''
-    flag=0
-    with open(basedir+'/diary.txt',"r") as file:
+
+@diary.route('/single-diary/<note_id>/<user_id>', methods=["POST"])
+def search(note_id, user_id):
+    buf = ''
+    flag = 0
+    with open(basedir+'/diary.txt', "r") as file:
         while True:
-            ch=file.read(1)
+            ch = file.read(1)
             if not ch:
                 break
-            if ch!='#':
-                buf=buf+ch
+            if ch != '#':
+                buf = buf+ch
             else:
-                fields=unpack(buf)
+                fields = unpack(buf)
                 if not verify_user(user_id):
                     return jsonify(
                         message="User not found"
                     ), 400
-                if note_id== fields[0]:
+                if note_id == fields[0]:
                     print("details found\n")
-                    flag=1
+                    flag = 1
                     return jsonify(
                         user_id=fields[1],
                         note_id=fields[0],
                         name=fields[2],
                         today=fields[3],
                         description=fields[4]
-                        ),200
-                buf=''
-        if flag==0:
+                    ), 200
+                buf = ''
+        if flag == 0:
             file.close()
-            return jsonify(message="user_id not found"),404
+            return jsonify(message="user_id not found"), 404
 
 # to get all diary using user_id
+
 
 @diary.route("/all-diary/<user_id>", methods=["GET"])
 def getAllDiary(user_id):
@@ -261,3 +263,47 @@ def deleteDiary(noteId, userId):
         return jsonify(
             message="Diary not deleted"
         ), 400
+
+
+# To search diary using date
+
+@diary.route("/search-by/date/<userId>", methods=["POST"])
+def searchDiaryByDate(userId):
+    diary = []
+    created_date = request.json["created_date"]
+    buf = ''
+    flag = 0
+    with open(basedir+'/diary.txt', "r") as file:
+        while True:
+            ch = file.read(1)
+            if not ch:
+                break
+            if ch != '#':
+                buf = buf+ch
+            else:
+                fields = unpack(buf)
+                if not verify_user(userId):
+                    return jsonify(
+                        message="User not found"
+                    ), 400
+                if userId == fields[1]:
+                    if created_date == fields[3]:
+                        flag = 1
+                        data = {
+                            "note_id": fields[0],
+                            "user_id": fields[1],
+                            "name": fields[2],
+                            "date": fields[3],
+                            "description": fields[4]
+                        }
+                    diary.append(data)
+                buf = ''
+        if flag == 1:
+            return jsonify(
+                diary=diary
+            ), 200
+        if flag == 0:
+            file.close()
+            return jsonify(
+                message="Record not found",
+            ), 400
