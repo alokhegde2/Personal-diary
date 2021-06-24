@@ -94,10 +94,11 @@ def verify_user(id):
             file.close()
             return False
 
-#to check diary name already in list
+# to check diary name already in list
 
-def check_list(note_id,diary):
-    for i in range(0,len(diary)):
+
+def check_list(note_id, diary):
+    for i in range(0, len(diary)):
         if diary[i]["note_id"] == note_id:
             return False
     return True
@@ -296,14 +297,14 @@ def searchDiaryByDate(userId):
                     ), 400
                 if userId == fields[1]:
                     if created_date == fields[3]:
-                        if check_list(fields[0],diary):
+                        if check_list(fields[0], diary):
                             flag = 1
                             data = {
-                            "note_id": fields[0],
-                            "user_id": fields[1],
-                            "name": fields[2],
-                            "date": fields[3],
-                            "description": fields[4]
+                                "note_id": fields[0],
+                                "user_id": fields[1],
+                                "name": fields[2],
+                                "date": fields[3],
+                                "description": fields[4]
                             }
                             diary.append(data)
                         else:
@@ -312,7 +313,7 @@ def searchDiaryByDate(userId):
         if len(diary) == 0:
             return jsonify(
                 message="No results found"
-                ),400
+            ), 400
         if flag == 1:
             return jsonify(
                 diary=diary
@@ -347,14 +348,14 @@ def searchDiaryByName(userId):
                     ), 400
                 if userId == fields[1]:
                     if name in fields[2]:
-                        if check_list(fields[0],diary):
+                        if check_list(fields[0], diary):
                             flag = 1
                             data = {
-                            "note_id": fields[0],
-                            "user_id": fields[1],
-                            "name": fields[2],
-                            "date": fields[3],
-                            "description": fields[4]
+                                "note_id": fields[0],
+                                "user_id": fields[1],
+                                "name": fields[2],
+                                "date": fields[3],
+                                "description": fields[4]
                             }
                             diary.append(data)
                         else:
@@ -363,7 +364,7 @@ def searchDiaryByName(userId):
         if len(diary) == 0:
             return jsonify(
                 message="No results found"
-                ),400
+            ), 400
         if flag == 1:
             return jsonify(
                 diary=diary
