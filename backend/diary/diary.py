@@ -39,7 +39,7 @@ def insert(note_id, user_id, name, date, description):
 # Delete diary
 
 
-def delete_diary(note_id):
+def delete_diary(note_id,user_id):
     data = []
     buf = ''
     flag = 0
@@ -55,7 +55,7 @@ def delete_diary(note_id):
                 data.append(fields)
                 buf = ''
         for i in data:
-            if(i[0] == note_id):
+            if i[0] == note_id and i[1] == user_id:
                 index = data.index(i)
                 data.pop(index)
                 file.truncate(0)
@@ -108,11 +108,11 @@ def check_list(note_id, diary):
 # to create new diary
 
 
-@diary.route('/new', methods=["POST"])
+@diary.route('/new-diary', methods=["POST"])
 def create():
     created_date = str(date.today())
     note_id = str(uuid.uuid1())
-    name = request.json["name"]
+    name = request.json["title"]
     description = request.json["description"]
     user_id = request.json["user_id"]
     buf = ''
@@ -127,7 +127,12 @@ def create():
                     buf = buf+ch
                 else:
                     fields = unpack(buf)
-            if flag == 0:
+                    if not verify_user(user_id):
+                        return jsonify(
+                        message="User not found"
+                        ), 400
+                    flag = 1
+            if flag == 1:
                 buf = pack(note_id, user_id, name, created_date, description)
                 file_write(buf)
                 return jsonify(message="Diary Created"), 200
@@ -140,7 +145,7 @@ def create():
 # to get single diary using note_id
 
 
-@diary.route('/single-diary/<note_id>/<user_id>', methods=["POST"])
+@diary.route('/single-diary/<note_id>/<user_id>', methods=["GET"])
 def search(note_id, user_id):
     buf = ''
     flag = 0
@@ -158,19 +163,18 @@ def search(note_id, user_id):
                         message="User not found"
                     ), 400
                 if note_id == fields[0]:
-                    print("details found\n")
                     flag = 1
                     return jsonify(
                         user_id=fields[1],
                         note_id=fields[0],
                         name=fields[2],
-                        today=fields[3],
+                        created_date=fields[3],
                         description=fields[4]
                     ), 200
                 buf = ''
         if flag == 0:
             file.close()
-            return jsonify(message="user_id not found"), 404
+            return jsonify(message="Diary not found"), 404
 
 # to get all diary using user_id
 
@@ -221,7 +225,7 @@ def getAllDiary(user_id):
 def updateDiary(noteId, userId):
     note_id = noteId
     user_id = userId
-    name = request.json["name"]
+    name = request.json["title"]
     created_date = str(date.today())
     description = request.json["description"]
     buf = ''
@@ -240,10 +244,14 @@ def updateDiary(noteId, userId):
                     return jsonify(
                         message="User not found"
                     ), 400
-                if key == fields[0]:
+                if key == fields[0] and user_id == fields[1]:
                     flag = 1
                     insert(note_id, user_id, name, created_date, description)
-                    delete_diary(noteId)
+                    res = delete_diary(noteId,user_id)
+                    if res == "error" :
+                        return jsonify(
+                            message="Diary not deleted"
+                        ), 400
                     return jsonify(
                         message="Diary updated"
                     ), 200
@@ -263,7 +271,7 @@ def deleteDiary(noteId, userId):
         return jsonify(
             message="User not found"
         ), 400
-    response = delete_diary(noteId)
+    response = delete_diary(noteId,userId)
     if response == "success":
         return jsonify(
             message="Diary deleted"
@@ -347,7 +355,7 @@ def searchDiaryByName(userId):
                         message="User not found"
                     ), 400
                 if userId == fields[1]:
-                    if name in fields[2]:
+                    if name.lower() in fields[2].lower():
                         if check_list(fields[0], diary):
                             flag = 1
                             data = {

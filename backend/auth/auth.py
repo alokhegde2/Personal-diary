@@ -88,6 +88,7 @@ def delete_user(user_id):
                 buf = buf+ch
             else:
                 fields = unpack(buf)
+
                 test.append(fields)
                 buf = ''
         for i in test:
@@ -96,25 +97,22 @@ def delete_user(user_id):
                 test.pop(index)
                 file.truncate(0)
                 for lines in test:
-                    insert_diary(lines[0], lines[1], lines[2], lines[3])
+                    insert(lines[0], lines[1], lines[2], lines[3])
                 break
-        return jsonify(
-            message="User Deleted"
-        ), 200
+        return "success"
         if flag == 0:
             file.close()
-            return jsonify(
-                message="Record doesnt exist",
-                status=404
-            ), 404
+            return "error"
+
 
 # Delete diary
 
 
-def delete_diary(id):
+def delete_diary(user_id):
     new_path = os.path.join(basedir, '..\\diary\\diary.txt')
 
     diary = []
+    diary2 = []
     buf = ''
     flag = 0
     with open(new_path, "r+") as file:
@@ -129,23 +127,25 @@ def delete_diary(id):
                 diary.append(fields)
                 buf = ''
         for i in diary:
-            if(i[1] == id):
-                index = diary.index(i)
-                diary.pop(index)
-                file.truncate(0)
-                for lines in diary:
-                    insert_diary(lines[0], lines[1],
-                                 lines[2], lines[3], lines[4])
+            if i[1] == user_id:
+                diary2.append(i)
 
-        return jsonify(
-            message="User Deleted"
-        ), 200
+        for j in diary2:
+            for k in diary:
+                if j == k:
+                    index = diary.index(k)
+                    file.truncate(0)
+                    diary.pop(index)
+
+
+        for lines in diary:
+            insert_diary(lines[0],lines[1],lines[2],lines[3],lines[4])
+
+
+        return "success"
         if flag == 0:
             file.close()
-            return jsonify(
-                message="Record doesnt exist",
-                status=404
-            ), 404
+            return "error"
 
 
 # login user
@@ -295,40 +295,16 @@ def changePassword():
 
 # Deleting user
 
-@auth.route('/delete-user/<id>', methods=["DELETE"])
-def delete(id):
-    test = []
-    buf = ''
-    flag = 0
-    with open(basedir+'/user.txt', "r+") as file:
-        while True:
-            ch = file.read(1)
-            if not ch:
-                break
-            if ch != '#':
-                buf = buf+ch
-            else:
-                fields = unpack(buf)
-                if(id != fields[0]):
-                    return jsonify(
-                        message="User not found"
-                    ), 400
-                test.append(fields)
-                buf = ''
-        for i in test:
-            if(i[0] == id):
-                index = test.index(i)
-                test.pop(index)
-                file.truncate(0)
-                for lines in test:
-                    insert(lines[0], lines[1], lines[2], lines[3])
-        delete_diary(id)
+@auth.route('/delete-user/<userId>', methods=["DELETE"])
+def delete(userId):
+    response = delete_user(userId)
+    if response == "success":
+        delete_diary(userId)
+
         return jsonify(
-            message="User Deleted"
+            message="User deleted"
         ), 200
-        if flag == 0:
-            file.close()
-            return jsonify(
-                message="Record doesnt exist",
-                status=404
-            ), 404
+    if response == "error":
+        return jsonify(
+            message="User not deleted"
+        ), 400
