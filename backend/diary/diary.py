@@ -117,30 +117,28 @@ def create():
     user_id = request.json["user_id"]
     buf = ''
     flag = 0
-    if request.method == 'POST':
-        with open(basedir+'/diary.txt', "r") as file:
-            while True:
-                ch = file.read(1)
-                if not ch:
-                    break
-                if ch != "#":
-                    buf = buf+ch
-                else:
-                    fields = unpack(buf)
-                    if not verify_user(user_id):
-                        return jsonify(
-                        message="User not found"
-                        ), 400
+    with open(basedir+'/diary.txt', "r") as file:
+        while True:
+            ch = file.read(1)
+            if not ch:
+                break
+            if ch != '#':
+                buf = buf+ch
+            else:
+                fields = unpack(buf)
+                if not verify_user(user_id):
                     flag = 1
-            if flag == 1:
-                buf = pack(note_id, user_id, name, created_date, description)
-                file_write(buf)
-                return jsonify(message="Diary Created"), 200
+                    return jsonify(
+                        message="User not found"
+                    ), 400
+                buf = ''
         if flag == 0:
-            file.close()
+
+            buf = pack(note_id, user_id, name, created_date, description)
+            file_write(buf)
             return jsonify(
-                message="Diary not created",
-            ), 400
+                message="Diary Created"
+            ), 200
 
 # to get single diary using note_id
 
