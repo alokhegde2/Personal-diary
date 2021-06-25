@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="index.css">
     <link rel="shortcut icon" href="./assets/images/logo.png" type="image/x-icon">
+    <script>
+        user_id = localStorage.getItem("user_id")
+        if (user_id !== null) {
+            window.location.replace("./diary/main.html");
+        }
+    </script>
     <title>Personal Diary</title>
 </head>
 <body>
