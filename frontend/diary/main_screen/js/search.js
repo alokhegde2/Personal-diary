@@ -42,7 +42,7 @@ async function searchByDate(date) {
             (diary, index) => `
             <div class="row">
                             <div class="col diary-text">
-                                <h5>${diary.name} </h5>
+                            <a href="../html/diary_details.html?${diary.note_id}"><h5>${diary.name} </h5></a>
                                 <p>${truncateString(diary.description, 150)}</p>
                             </div>
                             <button class="col-auto mt-3 ml-5 delete" onClick = "deleteButtonClicked('${diary.note_id}')">

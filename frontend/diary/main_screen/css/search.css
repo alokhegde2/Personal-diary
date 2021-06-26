@@ -70,6 +70,10 @@ p{
     background-color: transparent;
 }
 
+a{
+    color: black !important;
+}
+
 
 
 /**for snack bar **/

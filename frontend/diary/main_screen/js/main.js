@@ -10,8 +10,6 @@ const snack = document.getElementById("snackbar")
 
 const user_id = localStorage.getItem("user_id");
 const api = "http://127.0.0.1:5000/diary";
-//Names of the developer
-const dev_list = ["Alok Hegde", "Kavya Shetty", "Aman Ahamed"]
 
 //To truncate the description
 function truncateString(str, num) {
@@ -32,10 +30,10 @@ window.onload = async function fetchDiary() {
     console.log(data.diary)
     if (response.status === 200) {
         diary_button.innerHTML = data.diary.map(
-            (diary, index) => `
+            (diary) => `
             <div class="row">
                             <div class="col diary-text">
-                                <h5>${diary.name} </h5>
+                                <a href="../html/diary_details.html?${diary.note_id}"><h5>${diary.name} </h5></a>
                                 <p>${truncateString(diary.description, 150)}</p>
                             </div>
                             <button class="col-auto mt-3 ml-5 delete" onClick = "deleteButtonClicked('${diary.note_id}')">
@@ -51,22 +49,9 @@ window.onload = async function fetchDiary() {
 
 }
 
-//setting developer name in footer
-
-// var counter = 0
-// var inst = setInterval(change, 5000);
-// function change() {
-//     developer.innerText = dev_list[counter];
-//     counter++;
-//     if (counter >= dev_list.length) {
-//         counter = 0;
-//     }
-// }
-
 //Handling delete button
 
 async function deleteButtonClicked(note_id) {
-    console.log(`${api}/delete-diary/${note_id}/${user_id}`)
     var response = await fetch(`${api}/delete-diary/${note_id}/${user_id}`, {
         method: "DELETE"
     })
@@ -92,11 +77,21 @@ searchDiary.addEventListener('click', function (e) {
     e.preventDefault();
     window.location.assign("../html/search.html");
 
-})
+});
 
 //Add diary event listner
 
 addDiary.addEventListener('click', function (e) {
     e.preventDefault();
     window.location.assign("../html/add_diary.html");
-})
+});
+
+
+window.addEventListener( "pageshow", function ( event ) {
+    var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
+    if ( historyTraversal ) {
+      // Handle page restore.
+      //alert('refresh');
+      window.location.reload();
+    }
+  });

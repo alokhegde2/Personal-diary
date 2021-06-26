@@ -5,7 +5,7 @@ const error = document.getElementById("error");
 const snack = document.getElementById("snackbar");
 
 
-var isError = false;
+let isError = false;
 
 const user_id = localStorage.getItem("user_id");
 const api = "http://127.0.0.1:5000/diary";
@@ -87,7 +87,16 @@ async function createDiary(title, description) {
 //handling form submit
 form.addEventListener("submit", function (e) {
     e.preventDefault();
-    checkRequired([title, description]);
+    if (title.value.trim() === "") {
+        showError(title, `Title is required`);
+        isError = true;
+    } else if (description.value.trim() === "") {
+        showError(description, `Description is required`);
+        isError = true;
+    } else {
+        // showSuccess([]);
+        isError = false;
+    }
     if (!isError) {
         createDiary(title, description);
     }
