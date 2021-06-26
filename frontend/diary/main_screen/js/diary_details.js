@@ -27,7 +27,7 @@ window.onload = async function fetchSingleDiary() {
 }
 
 function updateDiary() {
-    window.location.assign("../html/main.html");
+    window.location.assign(`../html/update_diary.html?${note_id}`);
 }
 
 async function deleteDiary() {
@@ -49,3 +49,13 @@ async function deleteDiary() {
         setTimeout(function () { snack.className = snack.className.replace("show", ""); }, 3000);
     }
 }
+
+//Page load 
+window.addEventListener( "pageshow", function ( event ) {
+    var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
+    if ( historyTraversal ) {
+      // Handle page restore.
+      //alert('refresh');
+      window.location.reload();
+    }
+  });
