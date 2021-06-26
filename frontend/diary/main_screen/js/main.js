@@ -53,15 +53,15 @@ window.onload = async function fetchDiary() {
 
 //setting developer name in footer
 
-var counter = 0
-var inst = setInterval(change, 5000);
-function change() {
-    developer.innerText = dev_list[counter];
-    counter++;
-    if (counter >= dev_list.length) {
-        counter = 0;
-    }
-}
+// var counter = 0
+// var inst = setInterval(change, 5000);
+// function change() {
+//     developer.innerText = dev_list[counter];
+//     counter++;
+//     if (counter >= dev_list.length) {
+//         counter = 0;
+//     }
+// }
 
 //Handling delete button
 
@@ -85,3 +85,10 @@ async function deleteButtonClicked(note_id) {
         setTimeout(function () { snack.className = snack.className.replace("show", ""); }, 3000);
     }
 }
+
+
+searchDiary.addEventListener('click', function (e) {
+    e.preventDefault();
+    window.location.assign("../html/search.html");
+
+})
