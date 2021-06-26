@@ -3,8 +3,15 @@ const searchDiary = document.getElementById("search");
 const user = document.getElementById("user");
 const diary_button = document.getElementById("diary-button");
 const error_msg = document.getElementById("error")
+const delete_button = document.getElementById("delete");
+const developer = document.getElementById("developer");
+const snack = document.getElementById("snackbar")
+
 
 const user_id = "8148363d-d5d7-11eb-bcdf-405bd84ec4ce";
+const api = "http://127.0.0.1:5000/diary";
+//Names of the developer
+const dev_list = ["Alok Hegde", "Kavya Shetty", "Aman Ahamed"]
 
 //To truncate the description
 function truncateString(str, num) {
@@ -20,26 +27,61 @@ function truncateString(str, num) {
 //to get fetch the diary when page is loaded
 
 window.onload = async function fetchDiary() {
-    const response = await fetch(`http://127.0.0.1:5000/diary/all-diary/${user_id}`);
+    const response = await fetch(`${api}/all-diary/${user_id}`);
     var data = await response.json();
     console.log(data.diary)
     if (response.status === 200) {
         diary_button.innerHTML = data.diary.map(
-            diary => `
+            (diary, index) => `
             <div class="row">
                             <div class="col diary-text">
-                                <h4>${diary.name} </h4>
+                                <h5>${diary.name} </h5>
                                 <p>${truncateString(diary.description, 150)}</p>
                             </div>
-                            <div class="col-auto mt-3 ml-4">
-                                <i class="far fa-trash-alt fa-3x"></i>
-                            </div>
+                            <button class="col-auto mt-3 ml-5 delete" onClick = "deleteButtonClicked('${diary.note_id}')">
+                                <i class="far fa-trash-alt fa-2x"></i>
+                            </button>
                         </div>
-                        <hr>
+                      <hr>
             `
         ).join(" ")
     } else if (response.status = 400) {
         error_msg.innerHTML = `<spam>${data.message}</spam>`
     }
 
+}
+
+//setting developer name in footer
+
+var counter = 0
+var inst = setInterval(change, 5000);
+function change() {
+    developer.innerText = dev_list[counter];
+    counter++;
+    if (counter >= dev_list.length) {
+        counter = 0;
+    }
+}
+
+//Handling delete button
+
+async function deleteButtonClicked(note_id) {
+    console.log(`${api}/delete-diary/${note_id}/${user_id}`)
+    var response = await fetch(`${api}/delete-diary/${note_id}/${user_id}`, {
+        method: "DELETE"
+    })
+
+    if (response.status === 400) {
+        snack.className = "show";
+        snack.innerText = "Unable to delete diary";
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () { snack.className = snack.className.replace("show", ""); }, 3000);
+    } else if (response.status === 200) {
+        snack.className = "show";
+        snack.innerText = "Diary Deleted Successfully"
+        location.reload();
+
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function () { snack.className = snack.className.replace("show", ""); }, 3000);
+    }
 }
