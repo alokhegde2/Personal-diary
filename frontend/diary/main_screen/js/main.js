@@ -8,7 +8,7 @@ const developer = document.getElementById("developer");
 const snack = document.getElementById("snackbar")
 
 
-const user_id = "8148363d-d5d7-11eb-bcdf-405bd84ec4ce";
+const user_id = localStorage.getItem("user_id");
 const api = "http://127.0.0.1:5000/diary";
 //Names of the developer
 const dev_list = ["Alok Hegde", "Kavya Shetty", "Aman Ahamed"]
@@ -86,9 +86,17 @@ async function deleteButtonClicked(note_id) {
     }
 }
 
+//Search diary event listner
 
 searchDiary.addEventListener('click', function (e) {
     e.preventDefault();
     window.location.assign("../html/search.html");
 
+})
+
+//Add diary event listner
+
+addDiary.addEventListener('click', function (e) {
+    e.preventDefault();
+    window.location.assign("../html/add_diary.html");
 })

@@ -4,11 +4,12 @@ const name_form = document.getElementById("name-form");
 const title = document.getElementById("title");
 const diary_button = document.getElementById("diary-button");
 const error = document.getElementById("error");
-const snack = document.getElementById("snackbar")
+const snack = document.getElementById("snackbar");
 
 
 //Some constatnts
-const user_id = "8148363d-d5d7-11eb-bcdf-405bd84ec4ce";
+const user_id = localStorage.getItem("user_id");
+
 const api = "http://127.0.0.1:5000/diary";
 
 //To truncate the description
@@ -51,7 +52,7 @@ async function searchByDate(date) {
                       <hr>
             `
         ).join(" ")
-        error.innerHTML ="";
+        error.innerHTML = "";
 
     } else if (response.status === 400) {
         diary_button.innerHTML = ""
@@ -89,7 +90,7 @@ async function searchByName(name) {
                       <hr>
             `
         ).join(" ");
-        error.innerHTML ="";
+        error.innerHTML = "";
     } else if (response.status === 400) {
         diary_button.innerHTML = ""
         error.innerHTML = "<h6>No match found</h6> "

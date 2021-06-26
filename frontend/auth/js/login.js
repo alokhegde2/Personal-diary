@@ -55,8 +55,8 @@ async function doRequest(mail, pass) {
     error.innerText = "";
     //Implementing local storage
     // localStorage.setItem('key',"value")
-    localStorage.setItem('user_id',data["user_id"])
-    window.location.assign("../../diary/main.html");
+    localStorage.setItem('user_id', data["user_id"])
+    window.location.assign("../../diary/main_screen/html/main.html");
     console.log(data["user_id"]);
   } else if (response.status == 403) {
     error.innerText = data["message"];
