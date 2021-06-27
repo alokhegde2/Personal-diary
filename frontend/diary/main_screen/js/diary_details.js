@@ -1,5 +1,6 @@
 const main_body = document.getElementById("main-body");
 const snack = document.getElementById("snackbar")
+const spinner = document.getElementById("spinner");
 
 
 const user_id = localStorage.getItem("user_id");
@@ -11,6 +12,7 @@ window.onload = async function fetchSingleDiary() {
     const data = await response.json();
     console.log(data)
     if (response.status === 200) {
+        spinner.className = "d-none";
         main_body.innerHTML = `
         <div class="header">
         <ul>
@@ -51,11 +53,11 @@ async function deleteDiary() {
 }
 
 //Page load 
-window.addEventListener( "pageshow", function ( event ) {
-    var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
-    if ( historyTraversal ) {
-      // Handle page restore.
-      //alert('refresh');
-      window.location.reload();
+window.addEventListener("pageshow", function (event) {
+    var historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
+    if (historyTraversal) {
+        // Handle page restore.
+        //alert('refresh');
+        window.location.reload();
     }
-  });
+});

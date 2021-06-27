@@ -74,6 +74,10 @@ a{
     color: black !important;
 }
 
+.visible{
+    display: inline;
+}
+
 
 
 /**for snack bar **/

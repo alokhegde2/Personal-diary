@@ -6,7 +6,7 @@ const error_msg = document.getElementById("error")
 const delete_button = document.getElementById("delete");
 const developer = document.getElementById("developer");
 const snack = document.getElementById("snackbar")
-
+const spinner = document.getElementById("spinner");
 
 const user_id = localStorage.getItem("user_id");
 const api = "http://127.0.0.1:5000/diary";
@@ -29,6 +29,7 @@ window.onload = async function fetchDiary() {
     var data = await response.json();
     console.log(data.diary)
     if (response.status === 200) {
+        spinner.className = "d-none";
         diary_button.innerHTML = data.diary.map(
             (diary) => `
             <div class="row">

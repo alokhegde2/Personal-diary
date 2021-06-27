@@ -5,6 +5,7 @@ const title = document.getElementById("title");
 const diary_button = document.getElementById("diary-button");
 const error = document.getElementById("error");
 const snack = document.getElementById("snackbar");
+const spinner = document.getElementById("spinner");
 
 
 //Some constatnts
@@ -23,9 +24,15 @@ function truncateString(str, num) {
     return str.slice(0, num) + '...'
 }
 
+//On window loads
+window.onload = function () {
+    spinner.className = "d-none";
+}
+
 //Search by date
 
 async function searchByDate(date) {
+    spinner.className = "spinner-border";
     const response = await fetch(`${api}/search-by/date/${user_id}`, {
         method: "POST",
         body: JSON.stringify({
@@ -38,6 +45,7 @@ async function searchByDate(date) {
     //Getting json data from response
     const data = await response.json();
     if (response.status === 200) {
+        spinner.className = "d-none";
         diary_button.innerHTML = data.diary.map(
             (diary, index) => `
             <div class="row">
@@ -55,6 +63,7 @@ async function searchByDate(date) {
         error.innerHTML = "";
 
     } else if (response.status === 400) {
+        spinner.className = "d-none";
         diary_button.innerHTML = ""
         error.innerHTML = "<h6>No match found</h6> "
 
@@ -64,6 +73,7 @@ async function searchByDate(date) {
 //Search by name
 
 async function searchByName(name) {
+    spinner.className = "spinner-border";
     const response = await fetch(`${api}/search-by/name/${user_id}`, {
         method: "POST",
         body: JSON.stringify({
@@ -76,6 +86,7 @@ async function searchByName(name) {
     //Getting json data from response
     const data = await response.json();
     if (response.status === 200) {
+        spinner.className = "d-none";
         diary_button.innerHTML = data.diary.map(
             (diary, index) => `
             <div class="row">
@@ -92,8 +103,11 @@ async function searchByName(name) {
         ).join(" ");
         error.innerHTML = "";
     } else if (response.status === 400) {
+        spinner.className = "d-none";
         diary_button.innerHTML = ""
         error.innerHTML = "<h6>No match found</h6> "
+    } else {
+        spinner.className = "d-none";
     }
 }
 
@@ -124,6 +138,7 @@ async function deleteButtonClicked(note_id) {
 //Search by date event listner
 date_form.addEventListener('submit', function (e) {
     e.preventDefault();
+    spinner.className = "visible";
     if (date.value === "") {
     } else {
         console.log(date.value);
@@ -134,6 +149,7 @@ date_form.addEventListener('submit', function (e) {
 //Search by name/title of diary event listner
 name_form.addEventListener('submit', function (e) {
     e.preventDefault();
+    spinner.className = "visible";
     if (title.value === "") {
 
     } else {
