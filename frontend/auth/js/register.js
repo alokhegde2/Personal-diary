@@ -49,6 +49,17 @@ function checkLength(input, min, max) {
       `${getFieldName(input)} must be less than ${max} characters`
     );
     isError = true;
+  } else if (input.value.length < max && input.value.length > min) {
+    for (var i = 0; i <= 9; i++) {
+      if (input.value.includes(`${i}`)) {
+        showError(
+          input,
+          `${getFieldName(input)} should not contain numbers`
+        );
+        isError = true;
+        return;
+      }
+    }
   } else {
     showSuccess(input);
     isError = false;
@@ -83,7 +94,7 @@ function doRequest(username, mail, pass) {
     .then(function (response) {
       if (response.ok) {
         error.innerText = "";
-        window.location.assign("../html/login.html");  
+        window.location.assign("../html/login.html");
         return response.json();
       }
       if (response.status == 409) {
