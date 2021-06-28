@@ -30,3 +30,7 @@ h1{
     font-weight: bolder !important;
     font-size: 5vh;
 }
+
+a{
+  color: black !important;
+}

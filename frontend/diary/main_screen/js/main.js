@@ -45,6 +45,7 @@ window.onload = async function fetchDiary() {
             `
         ).join(" ")
     } else if (response.status = 400) {
+        spinner.className = "d-none";
         error_msg.innerHTML = `<spam>${data.message}</spam>`
     }
 
