@@ -3,7 +3,11 @@ from datetime import date
 import os
 import uuid
 
+# Current directory
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+# directory path for storing files
+filesdir = os.path.join(basedir, '..\\files')
 
 diary = Blueprint('diary', __name__)
 
@@ -24,8 +28,8 @@ def unpack(s):
 # Writing data to file
 
 
-def file_write(buf):
-    with open(basedir+'/diary.txt', "a")as file:
+def file_write(buf, user_id):
+    with open(filesdir+'/'+user_id+'.txt', "a")as file:
         file.write(buf)
     file.close()
 
@@ -34,16 +38,16 @@ def file_write(buf):
 
 def insert(note_id, user_id, name, date, description):
     buf = pack(note_id, user_id, name, date, description)
-    file_write(buf)
+    file_write(buf, user_id)
 
 # Delete diary
 
 
-def delete_diary(note_id,user_id):
+def delete_diary(note_id, user_id):
     data = []
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r+") as file:
+    with open(filesdir+'/'+user_id+'.txt', "a", "r+") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -117,7 +121,12 @@ def create():
     user_id = request.json["user_id"]
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r") as file:
+    if not verify_user(user_id):
+        flag = 1
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -135,7 +144,7 @@ def create():
         if flag == 0:
 
             buf = pack(note_id, user_id, name, created_date, description)
-            file_write(buf)
+            file_write(buf, user_id)
             return jsonify(
                 message="Diary Created"
             ), 200
@@ -147,7 +156,11 @@ def create():
 def search(note_id, user_id):
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r") as file:
+    if not verify_user(user_id):
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -182,7 +195,11 @@ def getAllDiary(user_id):
     diary = []
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r") as file:
+    if not verify_user(user_id):
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -229,7 +246,11 @@ def updateDiary(noteId, userId):
     buf = ''
     flag = 0
     key = noteId
-    with open(basedir+'/diary.txt', "r+") as file:
+    if not verify_user(userId):
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r+") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -245,8 +266,8 @@ def updateDiary(noteId, userId):
                 if key == fields[0] and user_id == fields[1]:
                     flag = 1
                     insert(note_id, user_id, name, created_date, description)
-                    res = delete_diary(noteId,user_id)
-                    if res == "error" :
+                    res = delete_diary(noteId, user_id)
+                    if res == "error":
                         return jsonify(
                             message="Diary not deleted"
                         ), 400
@@ -269,7 +290,7 @@ def deleteDiary(noteId, userId):
         return jsonify(
             message="User not found"
         ), 400
-    response = delete_diary(noteId,userId)
+    response = delete_diary(noteId, userId)
     if response == "success":
         return jsonify(
             message="Diary deleted"
@@ -288,7 +309,11 @@ def searchDiaryByDate(userId):
     created_date = request.json["created_date"]
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r") as file:
+    if not verify_user(userId):
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r") as file:
         while True:
             ch = file.read(1)
             if not ch:
@@ -339,7 +364,11 @@ def searchDiaryByName(userId):
     name = str(request.json["name"])
     buf = ''
     flag = 0
-    with open(basedir+'/diary.txt', "r") as file:
+    if not verify_user(userId):
+        return jsonify(
+            message="User not found"
+        ), 400
+    with open(filesdir+'/'+user_id+'.txt', "r") as file:
         while True:
             ch = file.read(1)
             if not ch:
