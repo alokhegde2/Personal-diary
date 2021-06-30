@@ -5,6 +5,7 @@ import uuid
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+filesdir = os.path.join(basedir,'..\\files')
 auth = Blueprint('auth', __name__)
 # bcrypt = Bcrypt(app)
 
@@ -147,6 +148,16 @@ def delete_diary(user_id):
             file.close()
             return "error"
 
+#Create file for diary
+
+def create_file(user_id):
+    file = filesdir+"/"+user_id+".txt"
+    try:
+        open(file, 'a').close()
+    except OSError:
+        print('Failed creating the file')
+    else:
+        print('File created')
 
 # login user
 
@@ -212,6 +223,7 @@ def register_user():
 
             buf = pack(user_id, name, password, email)
             file_write(buf)
+            create_file(user_id)
             return jsonify(
                 status="Successs",
                 message="New user created"
